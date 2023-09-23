@@ -20,8 +20,7 @@ import com.shubham.SpringBootService.repository.LibraryRepository;
 
 @SpringBootApplication    
 public class SpringBootServiceApplication {
-	@Autowired
-	LibraryRepository repository;
+	
 	public static void main(String[] args) {
 		SpringApplication.run(SpringBootServiceApplication.class, args);
 	}
