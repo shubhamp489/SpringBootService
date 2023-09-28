@@ -4,13 +4,17 @@ package com.shubham.SpringBootService.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +31,8 @@ public class LibraryController {
 	@Autowired
 	LibraryService libraryService;
 	
+	private static final Logger logger=	LoggerFactory.getLogger(LibraryController.class);  // this is for logging purpose 
+	
 	
 	@PostMapping("/addBook")
 	public ResponseEntity addBookImplementation(@RequestBody Library library) 
@@ -34,7 +40,7 @@ public class LibraryController {
 		String id = libraryService.buildID(library.getIsbn(),library.getAisle());
 		AddResponse ad = new AddResponse();
 		if(!libraryService.checkBookAlreadyExist(id)) {
-		
+		logger.info("Book do not exist so creating one");
 		
 		library.setId(library.getIsbn()+library.getAisle());
 		repository.save(library);
@@ -78,4 +84,30 @@ public class LibraryController {
 	}
 	
 	
+	@PutMapping("/updateBook/{id}")
+	public ResponseEntity<Library> updateBook(@PathVariable(value="id")String id ,@RequestBody Library library) {
+		Library existingbook=repository.findById(id).get();
+		existingbook.setAisle(library.getAisle());
+		existingbook.setAuthor(library.getAuthor());
+		existingbook.setBook_name(library.getBook_name());
+		repository.save(existingbook);
+		//spring boot will converts java object into json and publish value
+		return new ResponseEntity<Library>(existingbook,HttpStatus.OK);
+		
+	}
+	@DeleteMapping("/deleteBook")
+	public ResponseEntity<String> deleteBookByid(@RequestBody Library library) {
+		Library libdelete=repository.findById(library.getId()).get();
+		repository.delete(libdelete);
+		logger.info("Book is deleted !!!!");
+		return new ResponseEntity<>("Congratulationss !!!!! Book is deleted..",HttpStatus.CREATED);
+		
+	}
+	@GetMapping("getAllBooks")
+	public List<Library> getAllbooksInDB(Library library) {
+	List<Library>	allbooks=repository.findAll();
+	return allbooks;	
+		
+	
+	}
 }
