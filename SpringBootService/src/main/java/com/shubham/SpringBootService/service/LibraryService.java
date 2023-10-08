@@ -29,8 +29,12 @@ public class LibraryService {
 		return true;
 	else
 	return false;
-		
+	}
 	
-						
-			}
+	
+	public Library getBookById(String id) {
+	return	repository.findById(id).get();
+	}
+	
+	
 }
